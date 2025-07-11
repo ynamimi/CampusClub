@@ -6,7 +6,6 @@ vendor
 .env
 
 # Ignore the Dockerfile and .dockerignore itself
-Dockerfile
 .dockerignore
 
 # Ignore storage files (including public storage folder)

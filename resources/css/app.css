@@ -1,0 +1,194 @@
+/* Navbar Styling */
+.navbar {
+    background-color: white(130, 38, 130) !important; /* White background */
+    padding: 5 0; /* Padding for better spacing */
+    box-shadow: none; /* Remove any shadow */
+    display: flex;
+    justify-content: space-between; /* Align logo to the left, nav items to the right */
+    align-items: center; /* Center items vertically */
+    position: fixed;
+    width: 100%; /* Make sure navbar spans the full width */
+    top: 0; /* Make sure the navbar is at the top */
+    left: 0; /* Align to the left */
+    z-index: 1000; /* Ensure it's above other elements */
+}
+/* Logo Alignment */
+.navbar-brand img {
+    max-width: 300px; /* Set the logo size */
+    height: auto;
+}
+
+body {
+    background-color: white(130, 38, 130) !important; /* White background */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Adjust the container to keep the navbar items aligned */
+.container {
+    max-width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.form-group input, .form-group select {
+    width: 63%; /* Make input fields fill the container */
+    padding: 4px;
+    font: size 0.5em; /* Adjust font size */
+    margin-bottom: 20px;
+}
+
+/* Login Heading Styling */
+.card-header {
+    font-size: 1.5em;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px; /* Add space between the heading and form */
+}
+
+/* Adjust the card for the login form */
+.card {
+    opacity: 0.9;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    width: 400px;
+    padding: 20px;
+}
+
+
+/* Styling for Register and Login Pages Background */
+body.register-page, body.login-page {
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Adjust form padding */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Adjust the login button styling */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    width: 100%; /* Make the button fill the entire width */
+    padding: 15px; /* Increase padding to make the button longer */
+    font-size: 1.2em; /* Adjust the font size */
+    text-align: center; /* Ensure text is centered */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+    border-radius: 5px; /* Add border radius for rounded corners */
+    margin-bottom: 20px;
+}
+
+/* Hover effect for the login button */
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    border-color: #004085; /* Darker border color on hover */
+}
+
+
+.btn-block {
+    padding: 10px;
+    font-size: 1.2em;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Styling for Public and Faculty Links */
+a {
+    text-decoration: none; /* Remove underline */
+    color: #333; /* Dark text color */
+    font-weight: bold; /* Make text bold */
+    padding: 10px;
+    transition: color 0.3s ease; /* Smooth transition for color change */
+    justify-content: center;
+}
+
+a:hover {
+    color: #007bff; /* Change text color on hover */
+}
+
+
+/* Flexbox Grid Layout Styling */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.col {
+    margin-bottom: 20px;
+}
+
+.card-img-top {
+    object-fit: contain; /* Ensures the whole image fits within the container */
+    height: 200px;       /* Adjust this value as necessary */
+    width: 100%;         /* Ensures the image spans across the card width */
+    max-width: 100%;     /* Prevents the image from exceeding the card width */
+    align-self: center;  /* Centers the image horizontally */
+}
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+    .navigation-links {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .navigation-links a {
+        width: 100%;
+    }
+
+    /* Adjust card display for smaller screens */
+    .col {
+        flex: 0 0 100%; /* Force each item to take full width on smaller screens */
+        max-width: 100%;
+    }
+}
+
+    <div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="bg-dark text-white" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Dashboard</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li><a href="{{ route('president.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ route('president.updateDetails') }}">Update Details</a></li>
+            <li><a href="{{ route('president.memberships') }}">Memberships</a></li>
+            <li><a href="{{ route('president.clubReport') }}">Club Reports</a></li>
+            <li><a href="{{ route('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="btn btn-primary" id="menu-toggle">Toggle Sidebar</button>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            @yield('content')
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("menu-toggle").addEventListener("click", function () {
+        document.getElementById("sidebar").classList.toggle("toggled");
+    });
+</script>

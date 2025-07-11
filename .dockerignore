@@ -1,0 +1,17 @@
+# Ignore Laravel's vendor and node_modules directories
+node_modules
+vendor
+
+# Ignore the .env file
+.env
+
+# Ignore the Dockerfile and .dockerignore itself
+Dockerfile
+.dockerignore
+
+# Ignore storage files (including public storage folder)
+public/storage
+
+# Ignore logs and temporary files
+*.log
+.git

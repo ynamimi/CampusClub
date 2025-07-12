@@ -27,4 +27,7 @@ RUN [ -f .env ] || cp .env.example .env \
 # Nginx config
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
+RUN ls -la /var/www/public && \
+    ls -la /var/www/public/index.php
+    
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]

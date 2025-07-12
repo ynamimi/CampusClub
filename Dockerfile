@@ -39,7 +39,8 @@ RUN mkdir -p /etc/nginx/sites-available && \
     rm -rf /etc/nginx/conf.d/default.conf
 
 COPY nginx/default.conf /etc/nginx/sites-available/default
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default &&
+RUN mkdir -p /etc/nginx/conf.d && \
+    cp /etc/nginx/sites-available/default /etc/nginx/conf.d/default.conf
 
 # PHP-FPM configuration
 RUN sed -i 's/^listen = .*/listen = 127.0.0.1:9000/' /usr/local/etc/php-fpm.d/zz-docker.conf

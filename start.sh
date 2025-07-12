@@ -8,4 +8,4 @@ php artisan route:clear
 php-fpm -D -y /usr/local/etc/php-fpm.conf -F -R 2>&1 | tee -a storage/logs/php-fpm.log &
 
 # Start Nginx in foreground
-nginx -g "daemon off; error_log /dev/stderr debug;" 2>&1 | tee -a storage/logs/nginx.log
+nginx -g "daemon off;"

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: campusclub
+    runtime: docker
+    env: node
+    buildCommand: ./build.sh  # Optional if using Dockerfile
+    deployCommand: php artisan optimize
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false

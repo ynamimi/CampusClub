@@ -1,39 +1,42 @@
-# Step 1: Use the official PHP image with FPM (FastCGI Process Manager)
 FROM php:8.1-fpm
 
-# Step 2: Install dependencies required for Laravel to work (like GD, MySQL, etc.)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     zip \
     git \
+    nginx \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql
 
-# Step 3: Install Composer (PHP dependency manager)
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Step 4: Set the working directory inside the container
 WORKDIR /var/www
 
-# Step 5: Copy composer files (composer.json and composer.lock)
 COPY composer.json composer.lock ./
+RUN composer install --no-autoloader --no-scripts --no-dev
 
-# Step 6: Install PHP dependencies
-RUN composer install --no-autoloader --no-scripts
-
-# Step 7: Copy the rest of your application files to the container
 COPY . .
 
-# Step 8: Generate the Laravel autoloader
-RUN composer dump-autoload --optimize
+RUN composer dump-autoload --optimize && \
+    php artisan optimize:clear && \
+    php artisan optimize
 
-# Step 9: Set permissions for the Laravel app
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Expose port 80 for the container to communicate
-EXPOSE 80
+RUN mkdir -p /etc/nginx/sites-available && \
+    mkdir -p /etc/nginx/sites-enabled
 
-# Step 10: Start PHP-FPM to run the application
-CMD ["php-fpm"]
+COPY nginx/default.conf /etc/nginx/sites-available/default
+RUN rm -f /etc/nginx/sites-enabled/default && \
+    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+RUN sed -i 's/^listen = .*/listen = 127.0.0.1:9000/' /usr/local/etc/php-fpm.d/zz-docker.conf
+
+EXPOSE 8080
+
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+CMD ["/start.sh"]

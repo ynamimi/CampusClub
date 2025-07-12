@@ -1,8 +1,11 @@
 #!/bin/bash
-# Fix permissions (critical for Render)
-chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Clear cached files
+php artisan config:clear
+php artisan view:clear
+php artisan route:clear
 
-# Start services
-php-fpm -D
-nginx -g "daemon off;"
+# Start PHP-FPM with error logging
+php-fpm -D -y /usr/local/etc/php-fpm.conf -F -R 2>&1 | tee -a storage/logs/php-fpm.log &
+
+# Start Nginx in foreground
+nginx -g "daemon off; error_log /dev/stderr debug;" 2>&1 | tee -a storage/logs/nginx.log

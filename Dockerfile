@@ -1,65 +1,57 @@
 FROM php:8.1-fpm
 
-# Install system dependencies
+# Install system dependencies with cleanup
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    git \
-    nginx \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    zip git nginx && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd pdo pdo_mysql && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www
 
-# 1. First copy only what's needed for composer install
+# Optimized layer caching for dependencies
 COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-scripts --optimize-autoloader
 
-# 2. Install dependencies
-RUN composer install --no-autoloader --no-scripts --no-dev
-
-# 3. Copy the rest of the application
+# Copy application code
 COPY . .
 
-# 4. Set up environment
-RUN if [ ! -f ".env" ]; then cp .env.example .env; fi
+# Environment setup
+RUN if [ ! -f ".env" ]; then cp .env.example .env; fi && \
+    chown -R www-data:www-data /var/www && \
+    chmod -R 775 storage bootstrap/cache
 
-# 5. Generate autoload and optimize
+# Critical optimization steps
 RUN composer dump-autoload --optimize && \
-    php artisan optimize:clear && \
-    php artisan key:generate && \
-    php artisan optimize
+    php artisan key:generate --force && \
+    php artisan storage:link && \
+    php artisan optimize && \
+    php artisan config:clear && \
+    php artisan config:cache
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
-    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-# Configure Nginx
+# Nginx configuration
 RUN mkdir -p /etc/nginx/sites-available && \
-    mkdir -p /etc/nginx/sites-enabled
+    mkdir -p /etc/nginx/sites-enabled && \
+    rm -rf /etc/nginx/conf.d/default.conf
 
 COPY nginx/default.conf /etc/nginx/sites-available/default
-RUN rm -f /etc/nginx/sites-enabled/default && \
-    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
+    echo "daemon off;" >> /etc/nginx/nginx.conf
 
-# Configure PHP-FPM
+# PHP-FPM configuration
 RUN sed -i 's/^listen = .*/listen = 127.0.0.1:9000/' /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Logging setup
+RUN touch storage/logs/laravel.log && \
+    chown www-data:www-data storage/logs/laravel.log && \
+    ln -sf /dev/stdout storage/logs/laravel.log
 
 EXPOSE 8080
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
-# Add these right before CMD
-RUN php artisan storage:link && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
-
-# Ensure this exists for logging
-RUN touch /var/www/storage/logs/laravel.log && \
-    chown www-data:www-data /var/www/storage/logs/laravel.log
 CMD ["/start.sh"]

@@ -127,3 +127,13 @@ Route::controller(ClubController::class)->group(function () {
 
 // Fallback home route
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+Route::get('/healthcheck', function() {
+    return response()->json([
+        'php' => phpversion(),
+        'extensions' => ['pdo_mysql', 'openssl', 'mbstring'],
+        'storage_writable' => is_writable(storage_path()),
+        'bootstrap_writable' => is_writable(base_path('bootstrap/cache')),
+        'env_loaded' => !empty(env('APP_KEY'))
+    ]);
+});

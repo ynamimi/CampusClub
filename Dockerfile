@@ -1,10 +1,10 @@
 FROM php:8.1-fpm
 
-# Install dependencies including zip
+# Install dependencies including zip, nginx, and PostgreSQL client
 RUN apt-get update && apt-get install -y \
     nginx libpng-dev libzip-dev git \
     unzip zip \
-    && docker-php-ext-install zip pdo pdo_mysql \
+    libpq-dev && docker-php-ext-install zip pdo pdo_mysql \
     && apt-get clean
 
 # Install Composer
@@ -29,5 +29,5 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 RUN ls -la /var/www/public && \
     ls -la /var/www/public/index.php
-    
+
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]

@@ -10,3 +10,13 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
+      - key: DB_HOST
+        value: dpg-d1q0ef8dl3ps7399ll0g-a  # Make sure to replace with the actual PostgreSQL host
+      - key: DB_PORT
+        value: '5432'
+      - key: DB_DATABASE
+        value: campusclub  # Replace with your actual DB name
+      - key: DB_USERNAME
+        value: campusclub_user  # Replace with your actual DB username
+      - key: DB_PASSWORD
+        value: Ur07dyJwQWs6hxy4FVdKtgTLN3DlP2ON  # Replace with your actual DB password
